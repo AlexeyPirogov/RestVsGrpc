@@ -1,0 +1,32 @@
+syntax = "proto3";
+option java_multiple_files = true;
+package com.benchmark.grpc;
+//import "google/protobuf/wrappers.proto";
+
+message ProtoTrade {
+  string id=1;
+  string externalId=2;
+  string info=3;
+
+  string str1=4;
+  string str2=5;
+  string str3=6;
+  string str4=7;
+  string str5=8;
+  string str6=9;
+  string str7=10;
+  string str8=11;
+  string str9=12;
+  string str10=13;
+
+  int64 long1=14;
+  int64 long2=15;
+  int64 long3=16;
+  int64 long4=17;
+  int64 long5=18;
+  int64 long6=19;
+  int64 long7=20;
+  int64 long8=21;
+  int64 long9=22;
+  int64 long10=23;
+}

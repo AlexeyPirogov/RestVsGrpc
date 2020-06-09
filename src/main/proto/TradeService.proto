@@ -1,0 +1,24 @@
+syntax = "proto3";
+option java_multiple_files = true;
+import "ProtoTrade.proto";
+package com.benchmark.grpc;
+//import "google/protobuf/wrappers.proto";
+
+message QueryRequest {
+  int32 numberOfTrades = 1;
+}
+
+message PingRequest {
+    int32 val = 1;
+}
+
+message PongResponse {
+    int32 val = 1;
+}
+
+
+
+service TradeService {
+  rpc getTrades(QueryRequest) returns (stream com.benchmark.grpc.ProtoTrade) {};
+  rpc pingPong(PingRequest) returns (PongResponse) {};
+}
