@@ -1,14 +1,14 @@
 ### REST vs GRPC benchmark
 In this project we compare REST vs GRPC performance.
 
-#####Scenarios
+##### Scenarios
 1. Batch Streaming.   
 Generate thousands of objects and send to the client;
 2. Ping Pong (round-trip latency);  
 Client sends int number, servers receives and sends incremented value in response.
 Repeat round-trip multiple times;
 
-#####Benchmarks
+##### Benchmarks
 com.benchmark.RestVsGrpcBenchmark - REST vs GRPC in streaming and ping-pong benchmark;
 ```
 Benchmark                         (implementation)  Mode  Cnt    Score    Error  Units
@@ -44,11 +44,11 @@ GrpcParamsBenchmark.pingPong               false             LARGE  avgt    5   
 GrpcParamsBenchmark.pingPong               false             JUMBO  avgt    5   10.859 ±  0.716  ms/op
 ```
 
-#####Libraries
+##### Libraries
 REST: Server(Jetty + Servlet, Jackson), Client (java.net.http.HttpClient);  
 GRPC: GRPC + Netty;
 
-#####How to run benchmarks
+##### How to run benchmarks
 JDK 14 is required.
 ```
 mvn clean package
