@@ -6,18 +6,20 @@ import io.grpc.Server;
 import io.grpc.netty.NegotiationType;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.netty.NettyServerBuilder;
+import io.grpc.okhttp.OkHttpChannelBuilder;
 
 public class GrpcClientServerUtils {
 
-    private static final int WINDOW_SIZE = 128_000;
-    //    private static final int WINDOW_SIZE = 64_000;
-//    private static final int WINDOW_SIZE = 16_000;
-    private static final int channelCount = 4;
+    private static final GRPCParams DEFAULT_PARAMS = new GRPCParams(FlowWindowSize.SIMILAR_TO_REST, true, false);
 
     public enum FlowWindowSize {
-        SMALL(16383), MEDIUM(65535), DEFAULT(131070), LARGE(1048575), JUMBO(8388607);
+        SMALL(16383), MEDIUM(65535), SIMILAR_TO_REST(131070),
+//        LARGE(1048575),
+//        JUMBO(8388607)
+        ;
 
         private final int bytes;
+
         FlowWindowSize(int bytes) {
             this.bytes = bytes;
         }
@@ -30,10 +32,13 @@ public class GrpcClientServerUtils {
     public static class GRPCParams {
         private final FlowWindowSize flowWindowSize;
         private final boolean directExecutor;
+        private final boolean useHttpOk;
 
-        public GRPCParams(FlowWindowSize flowWindowSize, boolean directExecutor) {
+
+        public GRPCParams(FlowWindowSize flowWindowSize, boolean directExecutor, boolean useHttpOk) {
             this.flowWindowSize = flowWindowSize;
             this.directExecutor = directExecutor;
+            this.useHttpOk = useHttpOk;
         }
 
         public FlowWindowSize getFlowWindowSize() {
@@ -43,42 +48,23 @@ public class GrpcClientServerUtils {
         public boolean isDirectExecutor() {
             return directExecutor;
         }
-    }
 
-    private static GRPCParams DEFAULT_PARAMS = new GRPCParams(FlowWindowSize.DEFAULT, true);
+        public boolean isUseHttpOk() {
+            return useHttpOk;
+        }
+    }
 
     public static Server createServer(int port, GrpcTradeService grpcTradeService) {
         return createServer(port, grpcTradeService, DEFAULT_PARAMS);
     }
 
     public static Server createServer(int port, GrpcTradeService grpcTradeService, GRPCParams grpcParams) {
-        //        LocalAddress localAddress = new LocalAddress("grpc");
+        NettyServerBuilder serverBuilder = NettyServerBuilder.forPort(port).addService(grpcTradeService);
 
-        Server server;
-        NettyServerBuilder serverBuilder;
-        serverBuilder = NettyServerBuilder.forPort(port).addService(grpcTradeService);
-
-        if(grpcParams.isDirectExecutor())
+        if (grpcParams.isDirectExecutor())
             serverBuilder.directExecutor();
         serverBuilder.flowControlWindow(grpcParams.getFlowWindowSize().bytes());
         serverBuilder.compressorRegistry(CompressorRegistry.newEmptyInstance());
-
-        // Always set connection and stream window size to same value
-
-//        // Always use a different worker group from the client.
-//        ThreadFactory serverThreadFactory = new DefaultThreadFactory("STF pool", true /* daemon */);
-//        serverBuilder.workerEventLoopGroup(new NioEventLoopGroup(0, serverThreadFactory));
-//        serverBuilder.bossEventLoopGroup(new NioEventLoopGroup(1, serverThreadFactory));
-//ki
-////        ManagedChannel[] channels = new ManagedChannel[channelCount];
-//        ThreadFactory clientThreadFactory = new DefaultThreadFactory("CTF pool", true /* daemon */);
-//        channelBuilder.eventLoopGroup(new NioEventLoopGroup(1, clientThreadFactory));
-////        for (int i = 0; i < channelCount; i++) {
-////            // Use a dedicated event-loop for each channel
-////            channels[i] = channelBuilder
-////                    .eventLoopGroup(new NioEventLoopGroup(1, clientThreadFactory))
-////                    .clientChannel();
-////        }
 
         return serverBuilder.build();
     }
@@ -88,15 +74,24 @@ public class GrpcClientServerUtils {
     }
 
     public static ManagedChannel createClient(String host, int port, GRPCParams grpcParams) {
-        NettyChannelBuilder channelBuilder;
-        channelBuilder = NettyChannelBuilder.forAddress(host, port).usePlaintext();
-        if (grpcParams.isDirectExecutor())
-            channelBuilder.directExecutor();
-        channelBuilder.flowControlWindow(grpcParams.getFlowWindowSize().bytes());
+        if (grpcParams.isUseHttpOk()) {
+            OkHttpChannelBuilder okHttpChannelBuilder = OkHttpChannelBuilder.forAddress("localhost", port).usePlaintext();
+            if (grpcParams.isDirectExecutor())
+                okHttpChannelBuilder.directExecutor();
+            okHttpChannelBuilder.flowControlWindow(grpcParams.getFlowWindowSize().bytes());
+            okHttpChannelBuilder.compressorRegistry(CompressorRegistry.newEmptyInstance());
+            return okHttpChannelBuilder.build();
+        } else {
+            NettyChannelBuilder nettyChannelBuilder;
+            nettyChannelBuilder = NettyChannelBuilder.forAddress(host, port).usePlaintext();
+            if (grpcParams.isDirectExecutor())
+                nettyChannelBuilder.directExecutor();
+            nettyChannelBuilder.flowControlWindow(grpcParams.getFlowWindowSize().bytes());
 
-        channelBuilder.compressorRegistry(CompressorRegistry.newEmptyInstance());
-        channelBuilder.negotiationType(NegotiationType.PLAINTEXT);
-        return channelBuilder.build();
+            nettyChannelBuilder.compressorRegistry(CompressorRegistry.newEmptyInstance());
+            nettyChannelBuilder.negotiationType(NegotiationType.PLAINTEXT);
+            return nettyChannelBuilder.build();
+        }
     }
 
 }

@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-@Warmup(iterations = 2, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 5, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 1, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 3, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
 public class RestVsGrpcBenchmark {
 

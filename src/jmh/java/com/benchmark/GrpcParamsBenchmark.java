@@ -18,8 +18,8 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-@Warmup(iterations = 2, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 5, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 1, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 3, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
 public class GrpcParamsBenchmark {
 
@@ -32,11 +32,14 @@ public class GrpcParamsBenchmark {
         commonTradeService.initTrades(N);
     }
 
-    @Param(value = {"true", "false"})
-    private String directExecutor;
+    @Param({"true", "false"})
+    private boolean directExecutor;
 
     @Param
     private GrpcClientServerUtils.FlowWindowSize flowWindowSize;
+
+    @Param({"true", "false"})
+    private boolean useHttpOk;
 
 
     private BasicGrpcBenchmark benchmark;
@@ -49,7 +52,7 @@ public class GrpcParamsBenchmark {
     @Setup
     public void prepare() {
         benchmark = new BasicGrpcBenchmark();
-        GrpcClientServerUtils.GRPCParams params = new GrpcClientServerUtils.GRPCParams(flowWindowSize, Boolean.parseBoolean(directExecutor));
+        GrpcClientServerUtils.GRPCParams params = new GrpcClientServerUtils.GRPCParams(flowWindowSize, directExecutor, useHttpOk);
         benchmark.initServerAndClient("localhost", 8080, commonTradeService, params);
     }
 
