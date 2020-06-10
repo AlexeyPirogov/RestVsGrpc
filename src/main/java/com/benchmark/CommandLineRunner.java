@@ -31,8 +31,7 @@ public class CommandLineRunner {
     private int batchSize = 10_000;
 
     @Option(name = "-i", usage = "number of iterations")
-    private int iterations = 2;
-//    private int iterations = 10;
+    private int iterations = 10;
 
     @Option(name = "-pingPongIter", usage = "number of ping-pong round-trips per run (100 by default)")
     private int pingPongIters = 100;

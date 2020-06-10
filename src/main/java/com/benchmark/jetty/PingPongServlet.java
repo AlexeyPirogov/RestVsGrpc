@@ -12,7 +12,6 @@ public class PingPongServlet extends HttpServlet {
         int val = Integer.parseInt(request.getParameter("val"));
         PrintWriter writer = response.getWriter();
         writer.print(val+1);
-        writer.flush();//check if required
         writer.close();
     }
 }

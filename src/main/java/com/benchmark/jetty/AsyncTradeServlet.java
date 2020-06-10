@@ -16,18 +16,17 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-//todo: should we try blocking?
 public class AsyncTradeServlet extends HttpServlet {
 
-    //find workaround
+    //todo: check if it matters
+    public static final int BUFFER_SIZE = 16_000;
+
     public static CommonTradeService commonTradeService;
 
     private static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
     private static ObjectMapper createObjectMapper() {
-        ObjectMapper om = new ObjectMapper();
-//        om.enable(SerializationFeature.EAGER_SERIALIZER_FETCH);
-        return om;
+        return new ObjectMapper();
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -42,9 +41,7 @@ public class AsyncTradeServlet extends HttpServlet {
 
         ServletOutputStream out = response.getOutputStream();
 
-        //todo: decide about buf size param
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(8_000);
-//        ByteArrayOutputStream bos = new ByteArrayOutputStream(16_000);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
         JsonGenerator jsonGenerator = OBJECT_MAPPER.getFactory().createGenerator(bos);
         jsonGenerator.writeStartArray();
         out.setWriteListener(new WriteListener() {

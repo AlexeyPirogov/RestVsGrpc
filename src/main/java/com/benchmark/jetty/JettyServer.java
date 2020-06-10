@@ -6,6 +6,9 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 public class JettyServer {
 
+    //todo: check if it matters
+    public static final int OUTPUT_BUFFER_SIZE = 8100;
+
     private Server server;
 
     public void start(int port) throws Exception {
@@ -15,14 +18,12 @@ public class JettyServer {
         QueuedThreadPool threadPool = new QueuedThreadPool(maxThreads, minThreads, idleTimeout);
 
         HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setOutputBufferSize(8100);
+        httpConfig.setOutputBufferSize(OUTPUT_BUFFER_SIZE);
 
         server = new Server(threadPool);
         ServerConnector connector = new ServerConnector(server, new HttpConnectionFactory(httpConfig));
         connector.setPort(port);
         server.setConnectors(new Connector[] { connector });
-
-//        server.setHandler(new AsyncTradeHandler(commonTradeService));
 
         //servlet
         ServletHandler servletHandler = new ServletHandler();
