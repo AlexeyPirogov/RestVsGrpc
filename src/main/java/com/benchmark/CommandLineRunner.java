@@ -22,16 +22,19 @@ public class CommandLineRunner {
     private CLIENT_SERVER_MODE clientServerMode = CLIENT_SERVER_MODE.BOTH;
 
     @Option(name = "-t", usage = "client-server type (grpc|rest|both)")
-    private CLIENT_SERVER_TYPE clientServerType = CLIENT_SERVER_TYPE.BOTH;
+    private CLIENT_SERVER_TYPE clientServerType = CLIENT_SERVER_TYPE.GRPC;
+//    private CLIENT_SERVER_TYPE clientServerType = CLIENT_SERVER_TYPE.BOTH;
 
     @Option(name = "-benchmark", usage = "benchmark type (batch|pingPong|all)")
-    private BENCHMARK_TYPE benchmarkType = BENCHMARK_TYPE.ALL;
+//    private BENCHMARK_TYPE benchmarkType = BENCHMARK_TYPE.ALL;
+    private BENCHMARK_TYPE benchmarkType = BENCHMARK_TYPE.BATCH_STREAMING;
 
     @Option(name = "-n", usage = "number of objects in the batch")
     private int batchSize = 10_000;
 
     @Option(name = "-i", usage = "number of iterations")
-    private int iterations = 10;
+    private int iterations = 1;
+//    private int iterations = 10;
 
     @Option(name = "-pingPongIter", usage = "number of ping-pong round-trips per run (100 by default)")
     private int pingPongIters = 100;

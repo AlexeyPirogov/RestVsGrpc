@@ -16,9 +16,14 @@ message PongResponse {
     int32 val = 1;
 }
 
+message TradeBatch {
+    repeated com.benchmark.grpc.ProtoTrade trades = 1;
+}
+
 
 
 service TradeService {
-  rpc getTrades(QueryRequest) returns (stream com.benchmark.grpc.ProtoTrade) {};
   rpc pingPong(PingRequest) returns (PongResponse) {};
+  rpc getTrades(QueryRequest) returns (stream com.benchmark.grpc.ProtoTrade) {};
+  rpc getTradeBatches(QueryRequest) returns (stream TradeBatch) {};
 }

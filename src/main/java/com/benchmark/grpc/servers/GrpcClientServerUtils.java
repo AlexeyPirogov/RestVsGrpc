@@ -10,13 +10,15 @@ import io.grpc.okhttp.OkHttpChannelBuilder;
 
 public class GrpcClientServerUtils {
 
+//    private static final GRPCParams DEFAULT_PARAMS = new GRPCParams(FlowWindowSize.JUMBO, true, true);
     private static final GRPCParams DEFAULT_PARAMS = new GRPCParams(FlowWindowSize.SIMILAR_TO_REST, true, false);
+//    private static final GRPCParams DEFAULT_PARAMS = new GRPCParams(FlowWindowSize.SIMILAR_TO_REST, true, true);
 
     public enum FlowWindowSize {
-        SMALL(16383), MEDIUM(65535), SIMILAR_TO_REST(131070),
+//        SMALL(16383), MEDIUM(65535),
+        SIMILAR_TO_REST(131070);
 //        LARGE(1048575),
-//        JUMBO(8388607)
-        ;
+//        JUMBO(8388607);
 
         private final int bytes;
 
@@ -75,6 +77,7 @@ public class GrpcClientServerUtils {
 
     public static ManagedChannel createClient(String host, int port, GRPCParams grpcParams) {
         if (grpcParams.isUseHttpOk()) {
+            System.out.println("Using HTTP OK");
             OkHttpChannelBuilder okHttpChannelBuilder = OkHttpChannelBuilder.forAddress("localhost", port).usePlaintext();
             if (grpcParams.isDirectExecutor())
                 okHttpChannelBuilder.directExecutor();
@@ -82,6 +85,7 @@ public class GrpcClientServerUtils {
             okHttpChannelBuilder.compressorRegistry(CompressorRegistry.newEmptyInstance());
             return okHttpChannelBuilder.build();
         } else {
+            System.out.println("Using Netty");
             NettyChannelBuilder nettyChannelBuilder;
             nettyChannelBuilder = NettyChannelBuilder.forAddress(host, port).usePlaintext();
             if (grpcParams.isDirectExecutor())

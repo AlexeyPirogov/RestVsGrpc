@@ -18,10 +18,7 @@ import java.util.List;
 
 public class AsyncTradeServlet extends HttpServlet {
 
-    //todo: check if it matters
-    public static final int BUFFER_SIZE = 16_000;
-
-    public static CommonTradeService commonTradeService;
+    private static CommonTradeService commonTradeService;
 
     private static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
@@ -41,7 +38,8 @@ public class AsyncTradeServlet extends HttpServlet {
 
         ServletOutputStream out = response.getOutputStream();
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE/4);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
         JsonGenerator jsonGenerator = OBJECT_MAPPER.getFactory().createGenerator(bos);
         jsonGenerator.writeStartArray();
         out.setWriteListener(new WriteListener() {
@@ -69,12 +67,15 @@ public class AsyncTradeServlet extends HttpServlet {
                 }
             }
 
-
             @Override
             public void onError(Throwable t) {
                 getServletContext().log("Async Error", t);
                 async.complete();
             }
         });
+    }
+
+    public static void setCommonTradeService(CommonTradeService commonTradeService) {
+        AsyncTradeServlet.commonTradeService = commonTradeService;
     }
 }

@@ -27,11 +27,10 @@ public class BasicRestBenchmark implements Benchmark {
     public void initServer(int port, CommonTradeService commonTradeService) {
         jettyServer = new JettyServer();
         try {
-            jettyServer.start(port);
+            jettyServer.start(port, commonTradeService);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        AsyncTradeServlet.commonTradeService = commonTradeService;
     }
 
     @Override

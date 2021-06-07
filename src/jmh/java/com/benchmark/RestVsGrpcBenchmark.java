@@ -1,6 +1,7 @@
 package com.benchmark;
 
 import com.benchmark.benchmarks.framework.BasicGrpcBenchmark;
+import com.benchmark.benchmarks.framework.BasicRSocketBenchmark;
 import com.benchmark.benchmarks.framework.BasicRestBenchmark;
 import com.benchmark.benchmarks.framework.Benchmark;
 import com.benchmark.domain.Trade;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @State(Scope.Benchmark)
-@Warmup(iterations = 1, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2, timeUnit = TimeUnit.MILLISECONDS)
 @Measurement(iterations = 3, timeUnit = TimeUnit.MILLISECONDS)
 @Fork(value = 1, jvmArgs = {"-Xms2G", "-Xmx2G"})
 public class RestVsGrpcBenchmark {
@@ -33,7 +34,9 @@ public class RestVsGrpcBenchmark {
         commonTradeService.initTrades(N);
     }
 
-    @Param(value = {"BasicGrpcBenchmark", "BasicRestBenchmark"})
+    @Param(value = {"BasicGrpcBenchmark", "BasicRestBenchmark"
+//            ,"BasicRSocketBenchmark"
+    })
     private String implementation;
 
     private Benchmark benchmark;
@@ -53,6 +56,7 @@ public class RestVsGrpcBenchmark {
         return switch (implementation) {
             case "BasicRestBenchmark" -> new BasicRestBenchmark();
             case "BasicGrpcBenchmark" -> new BasicGrpcBenchmark();
+            case "BasicRSocketBenchmark" -> new BasicRSocketBenchmark();
             default -> throw new IllegalStateException("Unexpected value: " + implementation);
         };
     }

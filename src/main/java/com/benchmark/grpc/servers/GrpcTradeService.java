@@ -1,10 +1,7 @@
 package com.benchmark.grpc.servers;
 
 import com.benchmark.domain.Trade;
-import com.benchmark.grpc.PingRequest;
-import com.benchmark.grpc.PongResponse;
-import com.benchmark.grpc.ProtoTrade;
-import com.benchmark.grpc.TradeServiceGrpc;
+import com.benchmark.grpc.*;
 import com.benchmark.service.CommonTradeService;
 import io.grpc.stub.StreamObserver;
 
@@ -29,16 +26,37 @@ public class GrpcTradeService extends TradeServiceGrpc.TradeServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    private int batchSize = 500;
+
     @Override
-    public void pingPong(PingRequest request, StreamObserver<PongResponse> responseObserver) {
-        int val = request.getVal();
-        PongResponse.newBuilder().setVal(val+1).build();
-        responseObserver.onNext(
-                PongResponse.newBuilder().setVal(val+1).build());
+    public void getTradeBatches(QueryRequest request, StreamObserver<TradeBatch> responseObserver) {
+        int numberOfTrades = request.getNumberOfTrades();
+        List<Trade> trades = commonTradeService.getTrades(numberOfTrades);
+
+        TradeBatch.Builder tradeBatchBuilder = TradeBatch.newBuilder();
+        for (int i = 0; i < numberOfTrades; i++) {
+            tradeBatchBuilder.addTrades(convert(trades.get(i)));
+
+            if (i % batchSize == 0 && i > 0) {
+                responseObserver.onNext(tradeBatchBuilder.build());
+                tradeBatchBuilder = TradeBatch.newBuilder();
+            }
+        }
+        responseObserver.onNext(tradeBatchBuilder.build());
+
         responseObserver.onCompleted();
     }
 
-    private ProtoTrade convert(Trade trade) {
+    @Override
+    public void pingPong(PingRequest request, StreamObserver<PongResponse> responseObserver) {
+        int val = request.getVal();
+        PongResponse.newBuilder().setVal(val + 1).build();
+        responseObserver.onNext(
+                PongResponse.newBuilder().setVal(val + 1).build());
+        responseObserver.onCompleted();
+    }
+
+    public ProtoTrade convert(Trade trade) {
         ProtoTrade.Builder builder = ProtoTrade.newBuilder();
 
         builder.setId(trade.getId());

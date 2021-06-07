@@ -62,6 +62,7 @@ public class GrpcParamsBenchmark {
         benchmark.loadTrades(state.trades, N);
     }
 
+
     @org.openjdk.jmh.annotations.Benchmark
     @Threads(1)
     public void pingPong() {
